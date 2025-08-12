@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aktivasi Lisensi Bayyina</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f6ff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .container {
+        background: white;
+        padding: 20px;
+        max-width: 400px;
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        color: #007BFF;
+    }
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .status {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Aktivasi Lisensi Bayyina</h2>
+    <input type="email" id="email" placeholder="Masukkan Email Anda" required>
+    <input type="text" id="kode" placeholder="Masukkan Kode Lisensi" required>
+    <button onclick="aktivasi()">Aktifkan</button>
+    <div class="status" id="statusMsg"></div>
+</div>
+
+<script>
+function generateToken(length = 10) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let token = '';
+    for (let i = 0; i < length; i++) {
+        token += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return token;
+}
+
+function aktivasi() {
+    const email = document.getElementById("email").value.trim();
+    const kode = document.getElementById("kode").value.trim();
+    const statusMsg = document.getElementById("statusMsg");
+
+    if (!email || !kode) {
+        statusMsg.innerHTML = "Email dan Kode Lisensi wajib diisi.";
+        statusMsg.style.color = "red";
+        return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbz1zVNYMgzZaOktmMKjoxJdE5kEkr1Dg51q2LIEcJza9wJPxo7vxwhWZS6yS_A2dqIA/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, kode: kode })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const token = generateToken();
+            statusMsg.innerHTML = `
+                <span style="color:green;">Aktivasi berhasil!</span><br>
+                <b>Token Aktivasi:</b> ${token}<br>
+                Simpan token ini dan masukkan di aplikasi Bayyina untuk membuka akses.
+            `;
+            statusMsg.style.color = "green";
+        } else {
+            statusMsg.innerHTML = `<span style="color:red;">${data.message}</span>`;
+        }
+    })
+    .catch(err => {
+        statusMsg.innerHTML = "Terjadi kesalahan koneksi.";
+        statusMsg.style.color = "red";
+    });
+}
+</script>
+
+</body>
+</html>
